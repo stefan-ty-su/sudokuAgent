@@ -4,8 +4,11 @@ class SudokuLayout {
 
     constructor(sudokuArr) {
 
-        if (this.isValidSudokuArr(sudokuArr)) {
+        if (SudokuLayout.isValidSudokuArr(sudokuArr) == true) {
             this.grid = sudokuArr;
+        }
+        else {
+            console.log("Sudoku arr is not valid");
         }
 
     }
@@ -14,7 +17,7 @@ class SudokuLayout {
     static isValidSudokuArr(sudokuArr) {
         
         // Variable Definitions
-        let seen = Set();
+        let seen = new Set();
         for (let i = 0; i < this.gridSize; i++) {
             for (let j = 0; j < this.gridSize; j++) {
 
@@ -22,11 +25,11 @@ class SudokuLayout {
             if (num != '.') {
                 let rowString = 'row' + i + num;
                 let colString = 'col' + j + num;
-                let sqString = block + Math.floor(i/3) + Math.floor(j/3) + num;
+                let sqString = 'block' + Math.floor(i/3) + Math.floor(j/3) + num;
 
-                if (rowString in seen ||
-                    colString in seen ||
-                    sqString in seen) {
+                if (seen.has(rowString) ||
+                    seen.has(colString) ||
+                    seen.has(sqString)) {
                     return false;
                 }
 
@@ -41,3 +44,17 @@ class SudokuLayout {
         return true
     }
 }
+
+let sa = [
+    ["5","3",".",".","7",".",".",".","."],
+    ["5",".",".","1","9","5",".",".","."],
+    [".","9","8",".",".",".",".","6","."],
+    ["8",".",".",".","6",".",".",".","3"],
+    ["4",".",".","8",".","3",".",".","1"],
+    ["7",".",".",".","2",".",".",".","6"],
+    [".","6",".",".",".",".","2","8","."],
+    [".",".",".","4","1","9",".",".","5"],
+    [".",".",".",".","8",".",".","7","9"]
+];
+
+let layout = new SudokuLayout(sa);
