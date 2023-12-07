@@ -4,7 +4,9 @@ class SudokuLayout {
 
     constructor(sudokuArr) {
 
-        this.grid = sudokuArr;
+        if (this.isValidSudokuArr(sudokuArr)) {
+            this.grid = sudokuArr;
+        }
 
     }
 
