@@ -95,73 +95,6 @@ class SudokuLayout {
 
         return null;
     }
-
-    playMove(row, col, number) {
-
-        let rowString;
-        let colString;
-        let sqString;
-        let rowStr = String(row);
-        let colStr = String(col);
-        let arr;
-        let index;
-        let sqx;
-        let sqy;
-
-        if (!this.validMoves.has(rowStr + colStr)) { // player tries playing at a position that is invalid
-            throw new Error("Invalid Move");
-        }
-        else if (!this.validMoves.get(rowStr + colStr).includes(number)) { // player tries playing invalid number at position
-            throw new Error("Invalid Number");
-        }
-
-        // Adding move to seen
-        rowString = 'row' + row + number;
-        colString = 'col' + col + number;
-        sqx = Math.floor(row/3);
-        sqy = Math.floor(col/3);
-        sqString = 'block' + sqx + sqy + number;
-        this.seen.add(rowString);
-        this.seen.add(colString);
-        this.seen.add(sqString);
-
-        // Removing move form valid moves
-        this.validMoves.delete(rowStr + colStr); // Removing entire position from valid moves
-
-        for (let j = 0; j < this.gridSize; j++) { // Removing from positions in-line (rows)
-            if (this.validMoves.has(rowStr + String(j))) {
-                arr = this.validMoves.get(rowStr + String(j));
-                index = arr.indexOf(number);
-                if (index > -1) {
-                    arr.splice(index, 1);
-                }
-            }
-        }
-
-        for (let j = 0; j < this.gridSize; j++) { // Removing from positions in-line (cols)
-            if (this.validMoves.has(String(j) + colStr)) {
-                arr = this.validMoves.get(String(j) + colStr);
-                index = arr.indexOf(number);
-                if (index > -1) {
-                    arr.splice(index, 1);
-                }
-            }
-        }
-
-        for (let i = sqx*3; i < sqx*3+3; i++) { // Removing from square
-            for (let j = sqy*3; i < sqy*3+3; i++) {
-                if (this.validMoves.has(String(i) + String(j))) {
-                    arr = this.validMoves.get(String(i) + String(j));
-                    index = arr.indexOf(number);
-                    if (index > -1) {
-                        arr.splice(index, 1);
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
     
     getAValidPosition() {
         return this.validMoves.keys().next().value; // Returns first key
@@ -171,10 +104,6 @@ class SudokuLayout {
         return this.validMoves.get(String(row) + String(col))
     }
 
-    isComplete() {
-        return this.seen.size == 243;
-    }
-
 }
 
 class SudokuAgent {
@@ -182,7 +111,7 @@ class SudokuAgent {
     
     constructor(sudokuLayout) {
         this.layout = sudokuLayout;
-        this.grid = JSON.parse(JSON.stringify(sudokuLayout.grid));
+        this.grid = sudokuLayout.grid;
         this.size = 9;
     }
     
