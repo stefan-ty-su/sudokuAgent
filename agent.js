@@ -1,4 +1,4 @@
-"use strict"
+'use strict'
 
 class SudokuLayout {
 
@@ -28,7 +28,7 @@ class SudokuLayout {
             for (let j = 0; j < this.gridSize; j++) {
 
             num = sudokuArr[i][j]
-            if (num != '.') {
+            if (num != '0') {
                 rowString = 'row' + i + num;
                 colString = 'col' + j + num;
                 sqString = 'block' + Math.floor(i/3) + Math.floor(j/3) + num;
@@ -64,7 +64,7 @@ class SudokuLayout {
             for (let j = 0; j < this.gridSize; j++) {
 
                 num = this.grid[i][j]
-                if (num == '.') {
+                if (num == '0') {
                     for(let k = 1; k < this.gridSize+1; k++) {
                         rowString = 'row' + i + k;
                         colString = 'col' + j + k;
@@ -78,10 +78,10 @@ class SudokuLayout {
                             jStr = String(j);
                             if (this.validMoves.has(iStr + jStr)) {
                                 arr = this.validMoves.get(iStr + jStr);
-                                arr.push(k);
+                                arr.push(String(k));
                             }
                             else {
-                                arr = [k];
+                                arr = [String(k)];
                                 this.validMoves.set(iStr + jStr, arr);
                             }
                             
@@ -148,8 +148,8 @@ class SudokuLayout {
             }
         }
 
-        for (let i = sqx*3; i < sqx+3; i++) { // Removing from square
-            for (let j = sqy*3; i < sqy+3; i++) {
+        for (let i = sqx*3; i < sqx*3+3; i++) { // Removing from square
+            for (let j = sqy*3; i < sqy*3+3; i++) {
                 if (this.validMoves.has(String(i) + String(j))) {
                     arr = this.validMoves.get(String(i) + String(j));
                     index = arr.indexOf(number);
@@ -163,36 +163,116 @@ class SudokuLayout {
         return null;
     }
     
+    getAValidPosition() {
+        return this.validMoves.keys().next().value; // Returns first key
+    }
+
+    getValidValues(row, col) {
+        return this.validMoves.get(String(row) + String(col))
+    }
+
     isComplete() {
         return this.seen.size == 243;
+    }
+
+}
+
+class SudokuAgent {
+
+    
+    constructor(sudokuLayout) {
+        this.layout = sudokuLayout;
+        this.grid = JSON.parse(JSON.stringify(sudokuLayout.grid));
+        this.size = 9;
+    }
+    
+    backtrack() {
+        let validPosition = this.layout.getAValidPosition();
+        let row = parseInt(validPosition.slice(0,1));
+        let col = parseInt(validPosition.slice(1));
+
+        this.backtrackAux(this.grid, row, col);
+    }
+
+    backtrackAux(grid, row, col) {
+
+        if (row == this.size - 1 && col == this.size) { // When it reaches the end of the grid
+            return true;
+        }
+
+        if (col == this.size) {
+            row++;
+            col = 0;
+        }
+
+        if (grid[row][col] != 0) {
+            return this.backtrackAux(grid, row, col + 1);
+        }
+
+        let value;
+        let validValues = this.layout.getValidValues(row, col)
+        for(let i = 0; i < validValues.length; i++) {
+            value = validValues[i]
+            if (this.moveIsSafe(row, col, value)) {
+                grid[row][col] = value;
+                if (this.backtrackAux(grid, row, col + 1)) {
+                    return true;
+                }
+
+            }
+            grid[row][col] = 0;
+
+        }
+
+        return false
+
+    }
+
+    moveIsSafe(row, col, number) {
+        
+        // Checking rows
+        for (let i = 0; i < layout.gridSize; i++) {
+            if (this.grid[i][col] == number) {
+                return false
+            }
+        }
+
+        // Checking cols
+        for (let j = 0; j < layout.gridSize; j++) {
+            if (this.grid[row][j] == number) {
+                return false
+            }
+        }
+
+        // Checking square
+        let sqx = Math.floor(row/3);
+        let sqy = Math.floor(col/3);
+        for (let i = sqx*3; i < sqx*3 + 3; i++) {
+            for (let j = sqy*3; j < sqy*3 + 3; j++) {
+                if (this.grid[i][j] == number) {
+                    return false
+                }
+            }
+        }
+
+        return true
     }
 }
 
 let sa = [
-    ["5","3",".",".","7",".",".",".","."],
-    [".",".",".","1","9","5",".",".","."],
-    [".","9","8",".",".",".",".","6","."],
-    ["8",".",".",".","6",".",".",".","3"],
-    ["4",".",".","8",".","3",".",".","1"],
-    ["7",".",".",".","2",".",".",".","6"],
-    [".","6",".",".",".",".","2","8","."],
-    [".",".",".","4","1","9",".",".","5"],
-    [".",".",".",".","8",".",".","7","9"]
-];
-sa = [ // Valid Solved Sudoku
-    ["1","2","3","6","7","8","9","4","5"],
-    ["5","8","4","2","3","9","7","6","1"],
-    ["9","6","7","1","4","5","3","2","8"],
-    ["3","7","2","4","6","1","5","8","9"],
-    ["6","9","1","5","8","3","2","7","4"],
-    ["4","5","8","7","9","2","6","1","3"],
-    ["8","3","6","9","2","4","1","5","7"],
-    ["2","1","9","8","5","7","4","3","6"],
-    ["7","4","5","3","1","6","8","9","2"]
+    [5,3,0,0,7,0,0,0,0],
+    [0,0,0,1,9,5,0,0,0],
+    [0,9,8,0,0,0,0,6,0],
+    [8,0,0,0,6,0,0,0,3],
+    [4,0,0,8,0,3,0,0,1],
+    [7,0,0,0,2,0,0,0,6],
+    [0,6,0,0,0,0,2,8,0],
+    [0,0,0,4,1,9,0,0,5],
+    [0,0,0,0,8,0,0,7,9]
 ];
 
 let layout = new SudokuLayout(sa);
-// console.log(layout.validMoves);
-// layout.playMove(8, 0, 1)
-console.log(layout.validMoves);
-console.log(layout.isComplete());
+let agent = new SudokuAgent(layout);
+agent.backtrack();
+console.log(agent.grid);
+
