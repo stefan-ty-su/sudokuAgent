@@ -7,7 +7,7 @@ class SudokuAgent:
         self.layout = layout
         self.grid = layout.grid
         self.size = 9
-        self.emptyList = list(self.layout.validMoves.keys())
+        self.emptyList = list(self.layout.priorityDict.keys())
     
     def backtrack(self) -> bool:
         return self.backtrackAux(0)
@@ -20,10 +20,9 @@ class SudokuAgent:
         row = pos[0]
         col = pos[1]
 
-        for value in self.layout.validMoves[(row, col)]:
+        for value, count in self.layout.priorityDict[(row, col)]:
             if self.moveIsSafe(row, col, value):
                 self.grid[row][col] = value
-
                 if self.backtrackAux(index+1):
                     return True
             self.grid[row][col] = 0
@@ -62,7 +61,7 @@ sa = [
     [0,6,0,0,0,0,2,8,0],
     [0,0,0,4,1,9,0,0,5],
     [0,0,0,0,8,0,0,7,9]
-];
+]
 
 layout = SudokuLayout(sa)
 agent = SudokuAgent(layout)
