@@ -78,10 +78,10 @@ class SudokuLayout {
                             jStr = String(j);
                             if (this.validMoves.has(iStr + jStr)) {
                                 arr = this.validMoves.get(iStr + jStr);
-                                arr.push(String(k));
+                                arr.push(k);
                             }
                             else {
-                                arr = [String(k)];
+                                arr = [k];
                                 this.validMoves.set(iStr + jStr, arr);
                             }
                             
