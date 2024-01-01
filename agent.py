@@ -143,7 +143,5 @@ sa = [
 
 layout = SudokuLayout(sa)
 agent = SudokuAgent(layout)
-print(f'\nBefore: {agent.priorityDict}')
 agent.backtrack()
-print(f'\nAfter: {agent.priorityDict}')
 print(agent.grid)

@@ -9,7 +9,6 @@ class SudokuLayout:
 
         if self.isValidSudokuArr(sudokuArr) is True:
             self.calcValidMoves()
-            print("This Ran")
         else:
             raise ValueError("Sudoku Invalid")
     
